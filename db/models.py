@@ -1,9 +1,10 @@
 from datetime import datetime
-import settings
+
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import UniqueConstraint, QuerySet
+from django.db.models import UniqueConstraint
 
 
 class Genre(models.Model):
@@ -64,9 +65,8 @@ class MovieSession(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.movie.title} {datetime.strftime(
-            self.show_time, "%Y-%m-%d %H:%M:%S"
-        )}"
+        return (f"{self.movie.title} "
+                f"{datetime.strftime(self.show_time, "%Y-%m-%d %H:%M:%S")}")
 
 
 class User(AbstractUser):
@@ -81,11 +81,11 @@ class Order(models.Model):
         related_name="orders"
     )
 
-    def __str__(self) -> str:
-        return f"<Order: {datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S")}>"
-
     class Meta:
         ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S")
 
 
 class Ticket(models.Model):
@@ -112,8 +112,8 @@ class Ticket(models.Model):
 
     def __repr__(self) -> str:
         return (
-            f"<Ticket: {self.movie_session} "
-            f"(row: {self.row}, seat: {self.seat})>"
+            f"{self.movie_session} "
+            f"(row: {self.row}, seat: {self.seat})"
         )
 
     def __str__(self) -> str:
@@ -127,7 +127,7 @@ class Ticket(models.Model):
         number_seats = self.movie_session.cinema_hall.seats_in_row
         errors = {}
 
-        if self.seat not in range(1, number_seats):
+        if self.seat not in range(1, number_seats + 1):
             errors["seat"] = [
                 f"seat number must be in available range: "
                 f"(1, seats_in_row): "
@@ -135,7 +135,7 @@ class Ticket(models.Model):
             ]
             raise ValidationError(errors)
 
-        if self.row not in range(1, number_rows):
+        if self.row not in range(1, number_rows + 1):
             errors["row"] = [
                 f"row number must be in available range:"
                 f" (1, rows): (1, {number_rows})"

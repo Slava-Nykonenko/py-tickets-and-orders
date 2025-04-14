@@ -1,7 +1,9 @@
+from django.contrib.auth.models import User
+from django.db.models import QuerySet
+
 import init_django_orm  # noqa: F401
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import User
 
 
 def create_user(
@@ -9,7 +11,7 @@ def create_user(
         password: str,
         email: str = None,
         first_name: str = None,
-        last_name: str = None) -> User:
+        last_name: str = None) -> QuerySet[User]:
     get_user_model().objects.create_user(username=username, password=password)
     user = get_user_model().objects.get(username=username)
 
