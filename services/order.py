@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 
-import init_django_orm  # noqa: F401
+import init_django_orm  # noqa: E401
 from datetime import datetime
 
 from django.db import transaction
@@ -15,9 +15,11 @@ def create_order(
         username: str,
         date: str = None
 ) -> None:
-    order = Order(user=get_user_model().objects.get(username=username))
-    if date:
-        order.created_at = datetime.strptime(date, "%Y-%m-%d %H:%M")
+    order = Order(
+        user=get_user_model().objects.get(username=username),
+        created_at=datetime.strptime(date, "%Y-%m-%d %H:%M")
+        if date else datetime.now()
+    )
     order.save()
 
     for ticket in tickets:
