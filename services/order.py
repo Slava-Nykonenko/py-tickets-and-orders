@@ -1,0 +1,39 @@
+from django.contrib.auth import get_user_model
+
+import init_django_orm  # noqa: F401
+from datetime import datetime
+
+from django.db import transaction
+from django.db.models import QuerySet
+
+from db.models import Order, Ticket, MovieSession
+
+
+def create_order(
+        tickets: list[dict],
+        username: str,
+        date: str = None
+) -> None:
+    with transaction.atomic():
+        order = Order()
+        order.user = get_user_model().objects.get(username=username)
+        if date:
+            order.created_at = datetime.strptime(date, "%Y-%m-%d %H:%M")
+        order.save()
+
+        for ticket in tickets:
+            Ticket.objects.create(
+                movie_session=MovieSession.objects.get(
+                    pk=ticket["movie_session"]
+                ),
+                order=order,
+                row=ticket["row"],
+                seat=ticket["seat"]
+            )
+
+
+def get_orders(username: str = None) -> QuerySet:
+    result = Order.objects.all()
+    if username:
+        result = result.filter(user__username=username)
+    return result
