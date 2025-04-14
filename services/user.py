@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 
-import init_django_orm  # noqa: E401
+import init_django_orm  # noqa: F401
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import AbstractBaseUser
 

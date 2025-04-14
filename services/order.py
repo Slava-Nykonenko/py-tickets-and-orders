@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 
-import init_django_orm  # noqa: E401
+import init_django_orm  # noqa: F401
 from datetime import datetime
 
 from django.db import transaction
