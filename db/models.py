@@ -3,7 +3,7 @@ import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import UniqueConstraint
+from django.db.models import UniqueConstraint, QuerySet
 
 
 class Genre(models.Model):
@@ -74,7 +74,7 @@ class User(AbstractUser):
 
 
 class Order(models.Model):
-    created_at = models.DateTimeField(default=datetime.now)
+    created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -82,7 +82,7 @@ class Order(models.Model):
     )
 
     def __str__(self) -> str:
-        return f"{self.created_at}"
+        return f"<Order: {datetime.strftime(self.created_at, "%Y-%m-%d %H:%M:%S")}>"
 
     class Meta:
         ordering = ["-created_at"]
@@ -127,7 +127,7 @@ class Ticket(models.Model):
         number_seats = self.movie_session.cinema_hall.seats_in_row
         errors = {}
 
-        if not (0 < self.seat <= number_seats):
+        if self.seat not in range(1, number_seats):
             errors["seat"] = [
                 f"seat number must be in available range: "
                 f"(1, seats_in_row): "
@@ -135,7 +135,7 @@ class Ticket(models.Model):
             ]
             raise ValidationError(errors)
 
-        if not (0 < self.row < number_rows):
+        if self.row not in range(1, number_rows):
             errors["row"] = [
                 f"row number must be in available range:"
                 f" (1, rows): (1, {number_rows})"

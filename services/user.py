@@ -1,8 +1,7 @@
 import init_django_orm  # noqa: F401
 from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import AbstractBaseUser
-
-from db.models import User
+from django.contrib.auth.models import User
 
 
 def create_user(
@@ -11,7 +10,8 @@ def create_user(
         email: str = None,
         first_name: str = None,
         last_name: str = None) -> User:
-    user = User.objects.create_user(username=username, password=password)
+    get_user_model().objects.create_user(username=username, password=password)
+    user = get_user_model().objects.get(username=username)
 
     if email:
         user.email = email
@@ -38,7 +38,7 @@ def update_user(
         first_name: str = None,
         last_name: str = None
 ) -> AbstractBaseUser:
-    user = get_user_model().objects.get(id=user_id)
+    user = get_user(user_id=user_id)
 
     if username:
         user.username = username
